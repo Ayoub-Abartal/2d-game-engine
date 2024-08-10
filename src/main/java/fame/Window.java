@@ -1,9 +1,13 @@
 package fame;
 
+import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import sun.java2d.marlin.Version;
+import org.lwjgl.opengl.GL;
+
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -49,9 +53,47 @@ public class Window {
 
         // Create the window
         glfwWindow = glfwCreateWindow(this.width,this.height,this.title, NULL,NULL);
+
+        //
+        if(glfwWindow == NULL){
+            throw new IllegalStateException("Failed to create the GLFW window.");
+        }
+
+        // make the opengl context
+        glfwMakeContextCurrent(glfwWindow);
+        // Enable v-sync
+        glfwSwapInterval(1);
+
+        // make the window visible
+        glfwShowWindow(glfwWindow);
+
+        GL.createCapabilities();
+
     }
 
     public void loop(){
+        // This line is critical for LWJGL's interoperation with GLFW's
+        // OpenGL context, or any context that is managed externally.
+        // LWJGL detects the context that is current in the current thread,
+        // creates the GLCapabilities instance and makes the OpenGL
+        // bindings available for use.
 
+        // Run the rendering loop until the user has attempted to close
+        // the window or has pressed the ESCAPE key.
+
+        while(!glfwWindowShouldClose(glfwWindow)) {
+
+            // Poll events
+            glfwPollEvents();
+
+            glClearColor(1.0f,0.0f,0.0f,1.0f); 		// Set the clear color
+            glClear(GL_COLOR_BUFFER_BIT); // clear the framebuffer
+
+            glfwSwapBuffers(glfwWindow); // swap the color buffers
+
+
+            // Poll for window events. The key callback above will only be
+            // invoked during this call.
+        }
     }
 }
