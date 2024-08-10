@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11C.*;
@@ -32,8 +33,18 @@ public class Window {
 
     public void run(){
         System.out.println("Welcome to LWJGL "+ Version.getVersion()+"!");
+
         init();
         loop();
+
+        // Free memory after executing
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
+
+        // Free the Callback Error
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
+
     }
 
     public void init(){
@@ -67,16 +78,16 @@ public class Window {
         // make the window visible
         glfwShowWindow(glfwWindow);
 
-        GL.createCapabilities();
-
-    }
-
-    public void loop(){
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
+        GL.createCapabilities();
+
+    }
+
+    public void loop(){
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
